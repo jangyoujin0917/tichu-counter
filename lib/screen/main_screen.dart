@@ -163,181 +163,184 @@ class _MainScreenState extends State<MainScreen> {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text(
-            'Score',
-            style: TextStyle(
-              fontSize: 30,
-            ),
-          ),
-          content: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: SizedBox(
-              height: 335,
-              width: 400,
-              child: Column(
-                children: [
-                  const Text(
-                    'OneTwo',
-                    style: TextStyle(fontSize: 22),
-                  ),
-                  StatefulBuilder(
-                    builder: (context, setState) {
-                      return Row(
-                        children: [
-                          Expanded(
-                            child: RadioListTile(
-                              title: const Text("None"),
-                              value: OneTwoSelection.none,
-                              groupValue: _selection,
-                              onChanged: (OneTwoSelection? value) {
-                                _selection = value ?? _selection;
-                                setState(() {});
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            child: RadioListTile(
-                              title: const Text("Blue"),
-                              value: OneTwoSelection.blue,
-                              groupValue: _selection,
-                              onChanged: (OneTwoSelection? value) {
-                                _selection = value ?? _selection;
-                                setState(() {});
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            child: RadioListTile(
-                              title: const Text("Red"),
-                              value: OneTwoSelection.red,
-                              groupValue: _selection,
-                              onChanged: (OneTwoSelection? value) {
-                                _selection = value ?? _selection;
-                                setState(() {});
-                              },
-                            ),
-                          )
-                        ],
-                      );
-                    },
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Text(
-                    "Score",
-                    style: TextStyle(fontSize: 22),
-                  ),
-                  StatefulBuilder(
-                    builder: (context, setState) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Column(
-                            children: [
-                              Text(
-                                blueName,
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  color: Colors.lightBlue,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  _blueDragging = true;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    color: _blueDragging
-                                        ? Colors.grey[400]
-                                        : Colors.transparent,
-                                  ),
-                                  child: NumberPicker(
-                                    minValue: -25,
-                                    maxValue: 125,
-                                    step: 5,
-                                    value: _blueScore,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        if (_blueDragging) {
-                                          _blueScore = value;
-                                          _redScore = 100 - value;
-                                        }
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                redName,
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  color: Colors.red,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  _blueDragging = false;
-                                  setState(() {});
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    color: (!_blueDragging)
-                                        ? Colors.grey[400]
-                                        : Colors.transparent,
-                                  ),
-                                  child: NumberPicker(
-                                    minValue: -25,
-                                    maxValue: 125,
-                                    step: 5,
-                                    value: _redScore,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        if (!_blueDragging) {
-                                          _redScore = value;
-                                          _blueScore = 100 - value;
-                                        }
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ],
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          child: AlertDialog(
+            title: const Text(
+              'Score',
+              style: TextStyle(
+                fontSize: 30,
               ),
             ),
-          ),
-          actions: [
-            for (int i in [0, 2, 1, 3])
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context, i);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(14.0),
-                  child: Text(
-                    playerName[i],
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: (i % 2 == 0) ? Colors.lightBlue : Colors.red,
+            content: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: SizedBox(
+                height: 335,
+                width: 420,
+                child: Column(
+                  children: [
+                    const Text(
+                      'OneTwo',
+                      style: TextStyle(fontSize: 22),
+                    ),
+                    StatefulBuilder(
+                      builder: (context, setState) {
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: RadioListTile(
+                                title: const Text("None"),
+                                value: OneTwoSelection.none,
+                                groupValue: _selection,
+                                onChanged: (OneTwoSelection? value) {
+                                  _selection = value ?? _selection;
+                                  setState(() {});
+                                },
+                              ),
+                            ),
+                            Expanded(
+                              child: RadioListTile(
+                                title: const Text("Blue"),
+                                value: OneTwoSelection.blue,
+                                groupValue: _selection,
+                                onChanged: (OneTwoSelection? value) {
+                                  _selection = value ?? _selection;
+                                  setState(() {});
+                                },
+                              ),
+                            ),
+                            Expanded(
+                              child: RadioListTile(
+                                title: const Text("Red"),
+                                value: OneTwoSelection.red,
+                                groupValue: _selection,
+                                onChanged: (OneTwoSelection? value) {
+                                  _selection = value ?? _selection;
+                                  setState(() {});
+                                },
+                              ),
+                            )
+                          ],
+                        );
+                      },
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const Text(
+                      "Score",
+                      style: TextStyle(fontSize: 22),
+                    ),
+                    StatefulBuilder(
+                      builder: (context, setState) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Column(
+                              children: [
+                                Text(
+                                  blueName,
+                                  style: const TextStyle(
+                                    fontSize: 22,
+                                    color: Colors.lightBlue,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    _blueDragging = true;
+                                    setState(() {});
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      color: _blueDragging
+                                          ? Colors.grey[400]
+                                          : Colors.transparent,
+                                    ),
+                                    child: NumberPicker(
+                                      minValue: -25,
+                                      maxValue: 125,
+                                      step: 5,
+                                      value: _blueScore,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          if (_blueDragging) {
+                                            _blueScore = value;
+                                            _redScore = 100 - value;
+                                          }
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  redName,
+                                  style: const TextStyle(
+                                    fontSize: 22,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    _blueDragging = false;
+                                    setState(() {});
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      color: (!_blueDragging)
+                                          ? Colors.grey[400]
+                                          : Colors.transparent,
+                                    ),
+                                    child: NumberPicker(
+                                      minValue: -25,
+                                      maxValue: 125,
+                                      step: 5,
+                                      value: _redScore,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          if (!_blueDragging) {
+                                            _redScore = value;
+                                            _blueScore = 100 - value;
+                                          }
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              for (int i in [0, 2, 1, 3])
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, i);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Text(
+                      playerName[i],
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: (i % 2 == 0) ? Colors.lightBlue : Colors.red,
+                      ),
                     ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         );
       },
     ).then((result) {

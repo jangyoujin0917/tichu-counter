@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:tichu/model/round_history_model.dart';
 
@@ -20,7 +22,7 @@ class RoundScoreboard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(5),
       ),
-      height: 120,
+      height: min(MediaQuery.of(context).size.height / 6, 120),
       child: Row(
         children: [
           Expanded(
@@ -42,19 +44,22 @@ class RoundScoreboard extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: (history.onetwo == OneTwoState.blue)
-                      ? Container(
-                          margin: const EdgeInsets.symmetric(vertical: 30),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: Colors.lightBlue[400]!,
-                          ),
-                          child: const Center(
-                            child: Text(
-                              "1/2",
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                      ? FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(vertical: 30),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: Colors.lightBlue[400]!,
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "1/2",
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -114,19 +119,22 @@ class RoundScoreboard extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: (history.onetwo == OneTwoState.red)
-                      ? Container(
-                          margin: const EdgeInsets.symmetric(vertical: 30),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: Colors.red[400]!,
-                          ),
-                          child: const Center(
-                            child: Text(
-                              "1/2",
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                      ? FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(vertical: 30),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: Colors.red[400]!,
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "1/2",
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -174,25 +182,28 @@ class TichuBoard extends StatelessWidget {
       flex: 3,
       child: (history.tichuType[index] == TichuType.none)
           ? Container()
-          : Container(
-              margin: const EdgeInsets.symmetric(
-                horizontal: 10,
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                color: switch (history.tichuState[index]) {
-                  TichuState.ongoing => Colors.black,
-                  TichuState.success => color,
-                  TichuState.fail => Colors.grey,
-                  TichuState.none => color,
-                },
-              ),
-              child: Text(
-                "${(history.tichuType[index] == TichuType.small) ? "ST" : "LT"}\n${playerName[index]}",
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 32,
-                  color: Colors.white,
+          : FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  color: switch (history.tichuState[index]) {
+                    TichuState.ongoing => Colors.black,
+                    TichuState.success => color,
+                    TichuState.fail => Colors.grey,
+                    TichuState.none => color,
+                  },
+                ),
+                child: Text(
+                  "${(history.tichuType[index] == TichuType.small) ? "ST" : "LT"}\n${playerName[index]}",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 32,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),

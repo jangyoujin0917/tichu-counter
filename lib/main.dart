@@ -1,10 +1,17 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tichu/screen/main_screen.dart';
 
 void main() {
-  runApp(const ScoreboardApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+  ]).then((value) {
+    runApp(const ScoreboardApp());
+  });
 }
 
 class ScoreboardApp extends StatelessWidget {
