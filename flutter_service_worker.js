@@ -47,11 +47,11 @@ const RESOURCES = {"canvaskit/chromium/canvaskit.js": "0ae8bbcc58155679458a0f7a0
 "icons/ms-icon-144x144.png": "44b91e8b6367b7f49e3ad38a40e22ee6",
 "icons/ms-icon-150x150.png": "95a2eddeece7948d326cee09fac78e43",
 "icons/ms-icon-310x310.png": "d0d1bf6288f72b8b5657eecace15ba40",
-"index.html": "ef6e27d190ef421b284df4876b1f6397",
-"/": "ef6e27d190ef421b284df4876b1f6397",
+"index.html": "c7c61bc290e84abfc3c28181c161fd83",
+"/": "c7c61bc290e84abfc3c28181c161fd83",
 "main.dart.js": "41341fa0e8cccbb5246f26c89e5f09e1",
-"manifest.json": "245e725d5e30264adc8f7d7259123390",
-"favicon.png": "45de01883dfa30200ccfa2af762b3874"};
+"manifest.json": "68fc03989b2c88c6792f50d252daf9e5",
+"favicon.png": "a431f97aad254f88a48f07778f41cc17"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",
