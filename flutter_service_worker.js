@@ -48,9 +48,9 @@ const RESOURCES = {"canvaskit/chromium/canvaskit.js": "0ae8bbcc58155679458a0f7a0
 "icons/ms-icon-150x150.png": "95a2eddeece7948d326cee09fac78e43",
 "icons/ms-icon-310x310.png": "d0d1bf6288f72b8b5657eecace15ba40",
 "icons/android-icon-512x512.png": "dfad93075d47da036672faa2aab7a540",
-"index.html": "f8810c58b16099f37f0d94b8d9d4ce13",
-"/": "f8810c58b16099f37f0d94b8d9d4ce13",
-"main.dart.js": "ef0a8a919a8fa3cf956c85233e6bbf0f",
+"index.html": "f5bfb928bedb7aeb7e28ea2d8007ebaa",
+"/": "f5bfb928bedb7aeb7e28ea2d8007ebaa",
+"main.dart.js": "caa60bb4845f66c3245c442935734dfb",
 "manifest.json": "a1dce44ab7124cd50dbad588deaea686",
 "favicon.png": "a431f97aad254f88a48f07778f41cc17"};
 // The application shell files that are downloaded before a service worker can
