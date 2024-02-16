@@ -464,14 +464,16 @@ class _MainScreenState extends State<MainScreen> {
           ),
           IconButton(
             onPressed: onDownload,
-            icon: const Icon(
+            icon: Icon(
               Icons.download_rounded,
+              color: Colors.grey[800],
             ),
           ),
           IconButton(
             onPressed: onUpload,
-            icon: const Icon(
+            icon: Icon(
               Icons.upload_rounded,
+              color: Colors.grey[800],
             ),
           ),
         ],
