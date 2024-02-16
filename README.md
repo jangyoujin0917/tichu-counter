@@ -5,12 +5,6 @@ This is a tichu counter written in Dart.
 
 ## UPDATE
 
+- 2024.02.17 Added downloading and uploading history / Stop when one team gets 1000 points
 - 2024.02.16 Mobile landscape update / Changed mobile icons
 - 2024.02.15 Webpage opened https://jangyoujin0917.github.io/tichu-counter
-
-## TODO
-
-- Download & Upload history
-
-> https://pub.dev/packages/download \
-> https://pub.dev/packages/file_picker
