@@ -464,6 +464,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           IconButton(
             onPressed: onDownload,
+            iconSize: 30,
             icon: Icon(
               Icons.download_rounded,
               color: Colors.grey[800],
@@ -471,6 +472,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           IconButton(
             onPressed: onUpload,
+            iconSize: 30,
             icon: Icon(
               Icons.upload_rounded,
               color: Colors.grey[800],
