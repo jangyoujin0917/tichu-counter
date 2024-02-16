@@ -1,9 +1,14 @@
 import 'dart:convert';
+import 'dart:developer';
+import 'dart:typed_data';
 
+import 'package:download/download.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:tichu/dialog/refresh_dialog.dart';
 import 'package:tichu/dialog/tichu_dialog.dart';
+import 'package:tichu/model/entire_history_model.dart';
 import 'package:tichu/model/round_history_model.dart';
 import 'package:tichu/widget/round_scoreboard.dart';
 import 'package:tichu/dialog/settings_dialog.dart';
@@ -151,13 +156,22 @@ class _MainScreenState extends State<MainScreen> {
     if (histories.length == 1) {
       histories = [RoundHistoryModel()];
     } else {
-      histories.last = RoundHistoryModel();
-      histories.removeAt(histories.length - 2);
+      switch (histories.last.isdone) {
+        case DoneState.ongoing:
+          histories.last = RoundHistoryModel();
+          histories.removeAt(histories.length - 2);
+          break;
+        case DoneState.end:
+          histories.last = RoundHistoryModel();
+      }
     }
     saveState();
   }
 
   void onAddRound() {
+    if (histories.last.isdone == DoneState.end) {
+      return;
+    }
     _blueDragging = true;
     _blueScore = _redScore = 50;
     showDialog(
@@ -381,10 +395,46 @@ class _MainScreenState extends State<MainScreen> {
         }
         histories.last.isdone = DoneState.end;
 
-        histories.add(RoundHistoryModel());
         saveState();
+        if (blueScore < 1000 && redScore < 1000) {
+          histories.add(RoundHistoryModel());
+        }
+        setState(() {});
       }
     });
+  }
+
+  onDownload() {
+    final entire = EntireHistoryModel(
+      histories: histories,
+      playerName: playerName,
+      blueName: blueName,
+      redName: redName,
+    );
+    final String result = jsonEncode(entire);
+    final stream = Stream.fromIterable(result.codeUnits);
+    download(stream, "history.txt");
+  }
+
+  onUpload() async {
+    FilePickerResult? result = await FilePicker.platform
+        .pickFiles(type: FileType.custom, allowedExtensions: ['txt']);
+    if (result != null) {
+      Uint8List? bytes = result.files.single.bytes;
+      if (bytes != null) {
+        String s = utf8.decode(bytes);
+        try {
+          final historyModel = EntireHistoryModel.fromJson(jsonDecode(s));
+          histories = historyModel.histories;
+          blueName = historyModel.blueName;
+          redName = historyModel.redName;
+          playerName = historyModel.playerName;
+          setState(() {});
+        } catch (e) {
+          log("Strange type");
+        }
+      }
+    }
   }
 
   @override
@@ -411,6 +461,18 @@ class _MainScreenState extends State<MainScreen> {
             onPressed: () {
               launchUrlString(url);
             },
+          ),
+          IconButton(
+            onPressed: onDownload,
+            icon: const Icon(
+              Icons.download_rounded,
+            ),
+          ),
+          IconButton(
+            onPressed: onUpload,
+            icon: const Icon(
+              Icons.upload_rounded,
+            ),
           ),
         ],
       ),
