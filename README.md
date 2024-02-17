@@ -3,6 +3,8 @@
 This is a tichu counter written in Dart.
 **Web** is a main platform for this project.
 
+Old version with Pygame : https://github.com/jangyoujin0917/tichu-counter-old
+
 ## UPDATE
 
 - 2024.02.17 Added downloading and uploading history / Stop when one team gets 1000 points
