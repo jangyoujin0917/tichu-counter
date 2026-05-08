@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tichu/model/round_history_model.dart';
+import 'package:tichu/model/game_history_model.dart';
 
 class TichuDialog extends StatelessWidget {
   const TichuDialog({

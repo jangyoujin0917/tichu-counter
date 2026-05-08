@@ -28,7 +28,30 @@ class RoundHistoryModel {
 
   RoundHistoryModel();
 
-  RoundHistoryModel.fromJson(Map<String, dynamic> json)
+  void resolveTichu(int winnerIndex) {
+    for (int i = 0; i < 4; i++) {
+      if (tichuType[i] != TichuType.none) {
+        if (i == winnerIndex) {
+          tichuState[i] = TichuState.success;
+          if (i % 2 == 0) {
+            blue += tichuType[i] == TichuType.small ? 100 : 200;
+          } else {
+            red += tichuType[i] == TichuType.small ? 100 : 200;
+          }
+        } else {
+          tichuState[i] = TichuState.fail;
+          if (i % 2 == 0) {
+            blue -= tichuType[i] == TichuType.small ? 100 : 200;
+          } else {
+            red -= tichuType[i] == TichuType.small ? 100 : 200;
+          }
+        }
+      }
+    }
+    isdone = DoneState.end;
+  }
+
+  /*RoundHistoryModel.fromJson(Map<String, dynamic> json)
       : blue = json['blue'],
         red = json['red'],
         tichuType = json['tichu_type']
@@ -54,5 +77,21 @@ class RoundHistoryModel {
       'isdone': isdone.name,
     };
     return json;
+  }
+  */
+}
+
+class GameHistoryModel {
+  List<RoundHistoryModel> histories;
+  int blueScore, redScore;
+
+  GameHistoryModel(this.histories)
+      : blueScore = histories.fold(0, (sum, history) => sum + history.blue),
+        redScore = histories.fold(0, (sum, history) => sum + history.red);
+
+  void addRound(RoundHistoryModel history) {
+    histories.add(history);
+    blueScore += history.blue;
+    redScore += history.red;
   }
 }

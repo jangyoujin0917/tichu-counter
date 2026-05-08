@@ -1,15 +1,9 @@
-import 'dart:convert';
-import 'dart:developer';
-import 'dart:typed_data';
-
-import 'package:download/download.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:tichu/dialog/refresh_dialog.dart';
 import 'package:tichu/dialog/tichu_dialog.dart';
-import 'package:tichu/model/entire_history_model.dart';
-import 'package:tichu/model/round_history_model.dart';
+import 'package:tichu/model/command_history_model.dart';
+import 'package:tichu/model/game_history_model.dart';
 import 'package:tichu/widget/round_scoreboard.dart';
 import 'package:tichu/dialog/settings_dialog.dart';
 import 'package:tichu/widget/team_score.dart';
@@ -38,18 +32,17 @@ class _MainScreenState extends State<MainScreen> {
   bool _blueDragging = true;
 
   bool isSaved = false;
-  int blueScore = 0, redScore = 0;
   String blueName = defaultBlueName, redName = defaultRedName;
   List<String> playerName = List<String>.from(defaultPlayerName);
-  List<RoundHistoryModel> histories = [RoundHistoryModel()];
+  CommandHistoryModel commandHistory = CommandHistoryModel([]);
 
-  loadPrefs() async {
+  void loadPrefs() async {
     prefs = await SharedPreferences.getInstance();
     isSaved = prefs.getBool('isSaved') ?? false;
     if (isSaved) {
-      List<String> tmp = prefs.getStringList('history')!;
-      histories =
-          tmp.map((e) => RoundHistoryModel.fromJson(jsonDecode(e))).toList();
+      // List<String> tmp = prefs.getStringList('history')!;
+      // histories =
+      //    tmp.map((e) => RoundHistoryModel.fromJson(jsonDecode(e))).toList();
 
       blueName = prefs.getString('blueName')!;
       redName = prefs.getString('redName')!;
@@ -64,33 +57,27 @@ class _MainScreenState extends State<MainScreen> {
     loadPrefs();
   }
 
-  saveState() async {
-    blueScore = histories.fold(0, (prev, e) => prev + e.blue);
-    redScore = histories.fold(0, (prev, e) => prev + e.red);
+  void saveState() async {
     // save present info in prefs
     isSaved = true;
     await prefs.setBool('isSaved', true);
     await prefs.setString('blueName', blueName);
     await prefs.setString('redName', redName);
     await prefs.setStringList('playerName', playerName);
-    final tmp = histories.map((e) => jsonEncode(e)).toList();
-    await prefs.setStringList('history', tmp);
     setState(() {});
   }
 
-  refreshState() async {
+  void refreshState() async {
     // remove all saved things
     isSaved = false;
     blueName = defaultBlueName;
     redName = defaultRedName;
-    blueScore = redScore = 0;
     playerName = List<String>.from(defaultPlayerName);
-    histories = [RoundHistoryModel()];
     await prefs.setBool('isSaved', false);
     setState(() {});
   }
 
-  onRefresh() {
+  void onRefresh() {
     showDialog(
       context: context,
       builder: (context) {
@@ -103,7 +90,7 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  onSettingSave() {
+  void onSettingSave() {
     final blueC = TextEditingController(text: blueName);
     final redC = TextEditingController(text: redName);
     final playerC = [
@@ -145,33 +132,22 @@ class _MainScreenState extends State<MainScreen> {
       },
     ).then((player) {
       if (player != null) {
-        histories.last.tichuType[player] = tichu;
-        histories.last.tichuState[player] = TichuState.ongoing;
+        commandHistory.commands.add(TichuCommand(
+            playerIndex: player, isLarge: tichu == TichuType.large));
         saveState();
       }
     });
   }
 
   void onDelete() {
-    if (histories.length == 1) {
-      histories = [RoundHistoryModel()];
-    } else {
-      switch (histories.last.isdone) {
-        case DoneState.ongoing:
-          histories.last = RoundHistoryModel();
-          histories.removeAt(histories.length - 2);
-          break;
-        case DoneState.end:
-          histories.last = RoundHistoryModel();
-      }
+    if (commandHistory.commands.isNotEmpty) {
+      commandHistory.commands.removeLast();
+      saveState();
     }
-    saveState();
   }
 
   void onAddRound() {
-    if (histories.last.isdone == DoneState.end) {
-      return;
-    }
+    _selection = OneTwoSelection.none;
     _blueDragging = true;
     _blueScore = _redScore = 50;
     showDialog(
@@ -199,42 +175,35 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                     StatefulBuilder(
                       builder: (context, setState) {
-                        return Row(
-                          children: [
-                            Expanded(
-                              child: RadioListTile(
-                                title: const Text("None"),
-                                value: OneTwoSelection.none,
-                                groupValue: _selection,
-                                onChanged: (OneTwoSelection? value) {
-                                  _selection = value ?? _selection;
-                                  setState(() {});
-                                },
+                        return RadioGroup<OneTwoSelection>(
+                          groupValue: _selection,
+                          onChanged: (OneTwoSelection? value) {
+                            setState(() {
+                              _selection = value ?? _selection;
+                            });
+                          },
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: RadioListTile<OneTwoSelection>(
+                                  title: const Text("None"),
+                                  value: OneTwoSelection.none,
+                                ),
                               ),
-                            ),
-                            Expanded(
-                              child: RadioListTile(
-                                title: const Text("Blue"),
-                                value: OneTwoSelection.blue,
-                                groupValue: _selection,
-                                onChanged: (OneTwoSelection? value) {
-                                  _selection = value ?? _selection;
-                                  setState(() {});
-                                },
+                              Expanded(
+                                child: RadioListTile<OneTwoSelection>(
+                                  title: const Text("Blue"),
+                                  value: OneTwoSelection.blue,
+                                ),
                               ),
-                            ),
-                            Expanded(
-                              child: RadioListTile(
-                                title: const Text("Red"),
-                                value: OneTwoSelection.red,
-                                groupValue: _selection,
-                                onChanged: (OneTwoSelection? value) {
-                                  _selection = value ?? _selection;
-                                  setState(() {});
-                                },
+                              Expanded(
+                                child: RadioListTile<OneTwoSelection>(
+                                  title: const Text("Red"),
+                                  value: OneTwoSelection.red,
+                                ),
                               ),
-                            )
-                          ],
+                            ],
+                          ),
                         );
                       },
                     ),
@@ -360,51 +329,24 @@ class _MainScreenState extends State<MainScreen> {
     ).then((result) {
       if (result != null) {
         if (_selection == OneTwoSelection.none) {
-          histories.last.blue = _blueScore;
-          histories.last.red = _redScore;
+          commandHistory.commands.add(ScoreCommand(
+              winnerIndex: result, blueScore: _blueScore, redScore: _redScore));
         } else {
-          if (_selection == OneTwoSelection.blue) {
-            histories.last.blue = 200;
-            histories.last.red = 0;
-            histories.last.onetwo = OneTwoState.blue;
-          } else {
-            histories.last.red = 200;
-            histories.last.blue = 0;
-            histories.last.onetwo = OneTwoState.red;
-          }
+          commandHistory.commands.add(OneTwoCommand(
+              winnerIndex: result,
+              team: _selection == OneTwoSelection.blue
+                  ? OneTwoTeam.blue
+                  : OneTwoTeam.red));
         }
-        for (int i = 0; i < playerNum; i++) {
-          TichuType type = histories.last.tichuType[i];
-          if (type != TichuType.none) {
-            if (result == i) {
-              histories.last.tichuState[i] = TichuState.success;
-              if (i % 2 == 0) {
-                histories.last.blue += (type == TichuType.large) ? 200 : 100;
-              } else {
-                histories.last.red += (type == TichuType.large) ? 200 : 100;
-              }
-            } else {
-              histories.last.tichuState[i] = TichuState.fail;
-              if (i % 2 == 0) {
-                histories.last.blue -= (type == TichuType.large) ? 200 : 100;
-              } else {
-                histories.last.red -= (type == TichuType.large) ? 200 : 100;
-              }
-            }
-          }
-        }
-        histories.last.isdone = DoneState.end;
 
         saveState();
-        if (blueScore < 1000 && redScore < 1000) {
-          histories.add(RoundHistoryModel());
-        }
         setState(() {});
       }
     });
   }
 
-  onDownload() {
+  void onDownload() {
+    /*
     final entire = EntireHistoryModel(
       histories: histories,
       playerName: playerName,
@@ -414,11 +356,14 @@ class _MainScreenState extends State<MainScreen> {
     final String result = jsonEncode(entire);
     final stream = Stream.fromIterable(result.codeUnits);
     download(stream, "history.txt");
+    */
   }
 
-  onUpload() async {
+  void onUpload() async {
+    /*
     FilePickerResult? result = await FilePicker.platform
         .pickFiles(type: FileType.custom, allowedExtensions: ['txt']);
+    FilePickerResult? result = null;
     if (result != null) {
       Uint8List? bytes = result.files.single.bytes;
       if (bytes != null) {
@@ -435,10 +380,12 @@ class _MainScreenState extends State<MainScreen> {
         }
       }
     }
+    */
   }
 
   @override
   Widget build(BuildContext context) {
+    GameHistoryModel histories = commandHistory.toGameHistory();
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
@@ -492,14 +439,14 @@ class _MainScreenState extends State<MainScreen> {
                   child: TeamScore(
                     name: blueName,
                     color: Colors.lightBlue[100]!,
-                    score: blueScore,
+                    score: histories.blueScore,
                   ),
                 ),
                 Expanded(
                   child: TeamScore(
                     name: redName,
                     color: Colors.red[100]!,
-                    score: redScore,
+                    score: histories.redScore,
                   ),
                 ),
               ],
@@ -515,8 +462,8 @@ class _MainScreenState extends State<MainScreen> {
               color: Colors.grey[200],
               child: ListView.separated(
                   itemBuilder: (context, i) {
-                    int index = histories.length - i - 1;
-                    RoundHistoryModel history = histories[index];
+                    int index = histories.histories.length - i - 1;
+                    RoundHistoryModel history = histories.histories[index];
                     return RoundScoreboard(
                       history: history,
                       index: index,
@@ -528,7 +475,7 @@ class _MainScreenState extends State<MainScreen> {
                         thickness: 1,
                         color: Colors.grey[300],
                       ),
-                  itemCount: histories.length),
+                  itemCount: histories.histories.length),
             ),
           ),
           Expanded(
@@ -546,7 +493,7 @@ class _MainScreenState extends State<MainScreen> {
                       },
                       style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.all(Colors.grey[900]),
+                            WidgetStateProperty.all(Colors.grey[900]),
                       ),
                       child: Container(
                           decoration: BoxDecoration(
@@ -570,7 +517,7 @@ class _MainScreenState extends State<MainScreen> {
                       },
                       style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.all(Colors.grey[900]),
+                            WidgetStateProperty.all(Colors.grey[900]),
                       ),
                       child: Container(
                           decoration: BoxDecoration(

@@ -7,6 +7,10 @@ Old version with Pygame : https://github.com/jangyoujin0917/tichu-counter-old
 
 ## UPDATE
 
+- 2026.05.08 
+  + Default radio button is 'none' in onetwo
+  + Delete acts like undo
+  + Due to the structure change, storing at refresh do not work
 - 2024.02.17 Added downloading and uploading history / Stop when one team gets 1000 points
 - 2024.02.16 Mobile landscape update / Changed mobile icons
 - 2024.02.15 Webpage opened https://jangyoujin0917.github.io/tichu-counter
