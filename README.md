@@ -7,7 +7,7 @@ Old version with Pygame : https://github.com/jangyoujin0917/tichu-counter-old
 
 ## UPDATE
 
-- 2026.05.08
+- 2026.05.09
   - Default radio button is 'none' in onetwo
   - Delete acts like undo
   - Fixed download/upload button to import/export JSON file
