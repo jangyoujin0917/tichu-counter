@@ -1,5 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:numberpicker/numberpicker.dart';
+import 'package:tichu/dialog/add_round_dialog.dart';
 import 'package:tichu/dialog/refresh_dialog.dart';
 import 'package:tichu/dialog/tichu_dialog.dart';
 import 'package:tichu/model/command_history_model.dart';
@@ -9,6 +11,8 @@ import 'package:tichu/dialog/settings_dialog.dart';
 import 'package:tichu/widget/team_score.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:download/download.dart';
+import 'package:file_picker/file_picker.dart';
 
 const url = "https://github.com/jangyoujin0917/tichu-counter";
 const playerNum = 4;
@@ -27,26 +31,24 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   late final SharedPreferences prefs;
-  OneTwoSelection _selection = OneTwoSelection.none;
-  int _blueScore = 50, _redScore = 50;
-  bool _blueDragging = true;
 
   bool isSaved = false;
   String blueName = defaultBlueName, redName = defaultRedName;
-  List<String> playerName = List<String>.from(defaultPlayerName);
+  List<String> playerNames = List<String>.from(defaultPlayerName);
   CommandHistoryModel commandHistory = CommandHistoryModel([]);
 
   void loadPrefs() async {
     prefs = await SharedPreferences.getInstance();
     isSaved = prefs.getBool('isSaved') ?? false;
     if (isSaved) {
-      // List<String> tmp = prefs.getStringList('history')!;
-      // histories =
-      //    tmp.map((e) => RoundHistoryModel.fromJson(jsonDecode(e))).toList();
+      String jsonString = prefs.getString('history')!;
+      commandHistory = CommandHistoryModel.fromJson(
+        jsonDecode(jsonString) as Map<String, dynamic>,
+      );
 
       blueName = prefs.getString('blueName')!;
       redName = prefs.getString('redName')!;
-      playerName = prefs.getStringList('playerName')!;
+      playerNames = prefs.getStringList('playerName')!;
     }
     setState(() {});
   }
@@ -63,7 +65,9 @@ class _MainScreenState extends State<MainScreen> {
     await prefs.setBool('isSaved', true);
     await prefs.setString('blueName', blueName);
     await prefs.setString('redName', redName);
-    await prefs.setStringList('playerName', playerName);
+    await prefs.setStringList('playerName', playerNames);
+    final jsonString = jsonEncode(commandHistory.toJson());
+    await prefs.setString('history', jsonString);
     setState(() {});
   }
 
@@ -72,7 +76,8 @@ class _MainScreenState extends State<MainScreen> {
     isSaved = false;
     blueName = defaultBlueName;
     redName = defaultRedName;
-    playerName = List<String>.from(defaultPlayerName);
+    playerNames = List<String>.from(defaultPlayerName);
+    commandHistory = CommandHistoryModel([]);
     await prefs.setBool('isSaved', false);
     setState(() {});
   }
@@ -95,7 +100,7 @@ class _MainScreenState extends State<MainScreen> {
     final redC = TextEditingController(text: redName);
     final playerC = [
       for (int i = 0; i < playerNum; i++)
-        TextEditingController(text: playerName[i])
+        TextEditingController(text: playerNames[i])
     ];
     showDialog(
         context: context,
@@ -108,7 +113,7 @@ class _MainScreenState extends State<MainScreen> {
         }).then((_) {
       blueName = blueC.text.isNotEmpty ? blueC.text : defaultBlueName;
       redName = redC.text.isNotEmpty ? redC.text : defaultRedName;
-      playerName = [
+      playerNames = [
         for (int i = 0; i < playerNum; i++)
           playerC[i].text.isNotEmpty ? playerC[i].text : defaultPlayerName[i]
       ];
@@ -126,7 +131,7 @@ class _MainScreenState extends State<MainScreen> {
       context: context,
       builder: (context) {
         return TichuDialog(
-          playerName: playerName,
+          playerNames: playerNames,
           tichu: tichu,
         );
       },
@@ -147,240 +152,153 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void onAddRound() {
-    _selection = OneTwoSelection.none;
-    _blueDragging = true;
-    _blueScore = _redScore = 50;
-    showDialog(
-      context: context,
-      builder: (context) {
-        return FittedBox(
-          fit: BoxFit.scaleDown,
-          child: AlertDialog(
-            title: const Text(
-              'Score',
-              style: TextStyle(
-                fontSize: 30,
-              ),
-            ),
-            content: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: SizedBox(
-                height: 335,
-                width: 420,
-                child: Column(
-                  children: [
-                    const Text(
-                      'OneTwo',
-                      style: TextStyle(fontSize: 22),
-                    ),
-                    StatefulBuilder(
-                      builder: (context, setState) {
-                        return RadioGroup<OneTwoSelection>(
-                          groupValue: _selection,
-                          onChanged: (OneTwoSelection? value) {
-                            setState(() {
-                              _selection = value ?? _selection;
-                            });
-                          },
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: RadioListTile<OneTwoSelection>(
-                                  title: const Text("None"),
-                                  value: OneTwoSelection.none,
-                                ),
-                              ),
-                              Expanded(
-                                child: RadioListTile<OneTwoSelection>(
-                                  title: const Text("Blue"),
-                                  value: OneTwoSelection.blue,
-                                ),
-                              ),
-                              Expanded(
-                                child: RadioListTile<OneTwoSelection>(
-                                  title: const Text("Red"),
-                                  value: OneTwoSelection.red,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    const Text(
-                      "Score",
-                      style: TextStyle(fontSize: 22),
-                    ),
-                    StatefulBuilder(
-                      builder: (context, setState) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Column(
-                              children: [
-                                Text(
-                                  blueName,
-                                  style: const TextStyle(
-                                    fontSize: 22,
-                                    color: Colors.lightBlue,
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    _blueDragging = true;
-                                    setState(() {});
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      color: _blueDragging
-                                          ? Colors.grey[400]
-                                          : Colors.transparent,
-                                    ),
-                                    child: NumberPicker(
-                                      minValue: -25,
-                                      maxValue: 125,
-                                      step: 5,
-                                      value: _blueScore,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          if (_blueDragging) {
-                                            _blueScore = value;
-                                            _redScore = 100 - value;
-                                          }
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  redName,
-                                  style: const TextStyle(
-                                    fontSize: 22,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    _blueDragging = false;
-                                    setState(() {});
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      color: (!_blueDragging)
-                                          ? Colors.grey[400]
-                                          : Colors.transparent,
-                                    ),
-                                    child: NumberPicker(
-                                      minValue: -25,
-                                      maxValue: 125,
-                                      step: 5,
-                                      value: _redScore,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          if (!_blueDragging) {
-                                            _redScore = value;
-                                            _blueScore = 100 - value;
-                                          }
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            actions: [
-              for (int i in [0, 2, 1, 3])
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context, i);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(14.0),
-                    child: Text(
-                      playerName[i],
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: (i % 2 == 0) ? Colors.lightBlue : Colors.red,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        );
-      },
-    ).then((result) {
+    showDialog<Command>(
+        context: context,
+        builder: (context) {
+          return AddRoundDialog(
+              blueName: blueName, redName: redName, playerNames: playerNames);
+        }).then((Command? result) {
       if (result != null) {
-        if (_selection == OneTwoSelection.none) {
-          commandHistory.commands.add(ScoreCommand(
-              winnerIndex: result, blueScore: _blueScore, redScore: _redScore));
-        } else {
-          commandHistory.commands.add(OneTwoCommand(
-              winnerIndex: result,
-              team: _selection == OneTwoSelection.blue
-                  ? OneTwoTeam.blue
-                  : OneTwoTeam.red));
-        }
-
+        commandHistory.commands.add(result);
         saveState();
         setState(() {});
       }
     });
   }
 
-  void onDownload() {
-    /*
-    final entire = EntireHistoryModel(
-      histories: histories,
-      playerName: playerName,
-      blueName: blueName,
-      redName: redName,
-    );
-    final String result = jsonEncode(entire);
-    final stream = Stream.fromIterable(result.codeUnits);
-    download(stream, "history.txt");
-    */
+  Future<void> onDownload() async {
+    final now = DateTime.now();
+    final gameHistory = commandHistory.toGameHistory();
+
+    final exportData = <String, Object?>{
+      'schemaVersion': 1,
+      'date': now.toIso8601String(),
+      'playerName': playerNames,
+      'blueName': blueName,
+      'redName': redName,
+      'isGameEnd': gameHistory.isGameEnd(),
+      'commandHistory': commandHistory.toJson(),
+    };
+
+    final jsonText = const JsonEncoder.withIndent('  ').convert(exportData);
+    final fileName = 'tichu-counter-${_formatDateForFileName(now)}.json';
+
+    final stream = Stream<int>.fromIterable(utf8.encode(jsonText));
+
+    await download(stream, fileName);
+  }
+
+  String _formatDateForFileName(DateTime date) {
+    String two(int value) => value.toString().padLeft(2, '0');
+
+    return '${date.year}-'
+        '${two(date.month)}-'
+        '${two(date.day)}_'
+        '${two(date.hour)}-'
+        '${two(date.minute)}-'
+        '${two(date.second)}';
   }
 
   void onUpload() async {
-    /*
-    FilePickerResult? result = await FilePicker.platform
-        .pickFiles(type: FileType.custom, allowedExtensions: ['txt']);
-    FilePickerResult? result = null;
-    if (result != null) {
-      Uint8List? bytes = result.files.single.bytes;
-      if (bytes != null) {
-        String s = utf8.decode(bytes);
-        try {
-          final historyModel = EntireHistoryModel.fromJson(jsonDecode(s));
-          histories = historyModel.histories;
-          blueName = historyModel.blueName;
-          redName = historyModel.redName;
-          playerName = historyModel.playerName;
-          setState(() {});
-        } catch (e) {
-          log("Strange type");
-        }
+    try {
+      final result = await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+        allowMultiple: false,
+        withData: true,
+      );
+
+      // 사용자가 파일 선택을 취소한 경우
+      if (result == null || result.files.isEmpty) {
+        return;
       }
+
+      final file = result.files.single;
+      final bytes = file.bytes;
+
+      if (bytes == null) {
+        throw const FormatException('파일 내용을 읽을 수 없습니다.');
+      }
+
+      final jsonText = utf8.decode(bytes);
+      final decoded = jsonDecode(jsonText);
+
+      if (decoded is! Map<String, dynamic>) {
+        throw const FormatException('최상위 JSON은 object여야 합니다.');
+      }
+
+      final schemaVersion = _readInt(decoded, 'schemaVersion');
+
+      if (schemaVersion != 1) {
+        throw FormatException(
+          '지원하지 않는 schemaVersion입니다: $schemaVersion',
+        );
+      }
+
+      final uploadedPlayerName = _readStringList(decoded, 'playerName');
+
+      if (uploadedPlayerName.length != 4) {
+        throw FormatException(
+          'playerName은 정확히 4명이어야 합니다. 현재: ${uploadedPlayerName.length}명',
+        );
+      }
+
+      final uploadedBlueName = _readString(decoded, 'blueName');
+      final uploadedRedName = _readString(decoded, 'redName');
+
+      final commandHistoryJson = _readMap(decoded, 'commandHistory');
+      final uploadedCommandHistory = CommandHistoryModel.fromJson(
+        commandHistoryJson,
+      );
+
+      // date, isGameEnd는 일부러 복원하지 않음.
+      // isGameEnd는 필요할 때 commandHistory.toGameHistory().isGameEnd()로 다시 계산.
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        playerNames
+          ..clear()
+          ..addAll(uploadedPlayerName);
+
+        blueName = uploadedBlueName;
+        redName = uploadedRedName;
+
+        commandHistory.commands
+          ..clear()
+          ..addAll(uploadedCommandHistory.commands);
+      });
+
+      saveState();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('게임 기록을 불러왔습니다.'),
+        ),
+      );
+    } on FormatException catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      _showUploadError('JSON 형식이 올바르지 않습니다.\n${e.message}');
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      _showUploadError('파일을 불러오지 못했습니다.\n$e');
     }
-    */
+  }
+
+  void _showUploadError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 
   @override
@@ -467,7 +385,7 @@ class _MainScreenState extends State<MainScreen> {
                     return RoundScoreboard(
                       history: history,
                       index: index,
-                      playerName: playerName,
+                      playerNames: playerNames,
                     );
                   },
                   separatorBuilder: (context, index) => Divider(
@@ -585,4 +503,48 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
+}
+
+int _readInt(Map<String, dynamic> json, String key) {
+  final value = json[key];
+
+  if (value is int) {
+    return value;
+  }
+
+  throw FormatException('$key must be an int. Actual value: $value');
+}
+
+String _readString(Map<String, dynamic> json, String key) {
+  final value = json[key];
+
+  if (value is String) {
+    return value;
+  }
+
+  throw FormatException('$key must be a String. Actual value: $value');
+}
+
+List<String> _readStringList(Map<String, dynamic> json, String key) {
+  final value = json[key];
+
+  if (value is List && value.every((element) => element is String)) {
+    return value.cast<String>();
+  }
+
+  throw FormatException('$key must be a List<String>. Actual value: $value');
+}
+
+Map<String, dynamic> _readMap(Map<String, dynamic> json, String key) {
+  final value = json[key];
+
+  if (value is Map<String, dynamic>) {
+    return value;
+  }
+
+  if (value is Map) {
+    return Map<String, dynamic>.from(value);
+  }
+
+  throw FormatException('$key must be a JSON object. Actual value: $value');
 }

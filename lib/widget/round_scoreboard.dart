@@ -8,12 +8,12 @@ class RoundScoreboard extends StatelessWidget {
     super.key,
     required this.history,
     required this.index,
-    required this.playerName,
+    required this.playerNames,
   });
 
   final RoundHistoryModel history;
   final int index;
-  final List<String> playerName;
+  final List<String> playerNames;
 
   @override
   Widget build(BuildContext context) {
@@ -31,13 +31,13 @@ class RoundScoreboard extends StatelessWidget {
               children: [
                 TichuBoard(
                   history: history,
-                  playerName: playerName,
+                  playerName: playerNames,
                   index: 0,
                   color: Colors.lightBlue[400]!,
                 ),
                 TichuBoard(
                   history: history,
-                  playerName: playerName,
+                  playerName: playerNames,
                   index: 2,
                   color: Colors.lightBlue[400]!,
                 ),
@@ -143,13 +143,13 @@ class RoundScoreboard extends StatelessWidget {
                 ),
                 TichuBoard(
                   history: history,
-                  playerName: playerName,
+                  playerName: playerNames,
                   index: 1,
                   color: Colors.red[400]!,
                 ),
                 TichuBoard(
                   history: history,
-                  playerName: playerName,
+                  playerName: playerNames,
                   index: 3,
                   color: Colors.red[400]!,
                 ),

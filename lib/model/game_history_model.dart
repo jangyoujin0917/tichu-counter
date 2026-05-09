@@ -28,7 +28,15 @@ class RoundHistoryModel {
 
   RoundHistoryModel();
 
-  void resolveTichu(int winnerIndex) {
+  void resolveTichuScore(int winnerIndex) {
+    if (onetwo == OneTwoState.blue) {
+      blue = 200;
+      red = 0;
+    } else if (onetwo == OneTwoState.red) {
+      red = 200;
+      blue = 0;
+    }
+
     for (int i = 0; i < 4; i++) {
       if (tichuType[i] != TichuType.none) {
         if (i == winnerIndex) {
@@ -50,35 +58,6 @@ class RoundHistoryModel {
     }
     isdone = DoneState.end;
   }
-
-  /*RoundHistoryModel.fromJson(Map<String, dynamic> json)
-      : blue = json['blue'],
-        red = json['red'],
-        tichuType = json['tichu_type']
-            .toString()
-            .split(separation)
-            .map((e) => TichuType.values.byName(e))
-            .toList(),
-        tichuState = json['tichu_state']
-            .toString()
-            .split(separation)
-            .map((e) => TichuState.values.byName(e))
-            .toList(),
-        onetwo = OneTwoState.values.byName(json['onetwo']),
-        isdone = DoneState.values.byName(json['isdone']);
-
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = {
-      'blue': blue,
-      'red': red,
-      'tichu_type': tichuType.map((e) => e.name).toList().join(separation),
-      'tichu_state': tichuState.map((e) => e.name).toList().join(separation),
-      'onetwo': onetwo.name,
-      'isdone': isdone.name,
-    };
-    return json;
-  }
-  */
 }
 
 class GameHistoryModel {
@@ -93,5 +72,19 @@ class GameHistoryModel {
     histories.add(history);
     blueScore += history.blue;
     redScore += history.red;
+  }
+
+  bool isGameEnd() {
+    const scoreCrit = 1000;
+    if (blueScore == redScore) {
+      return false;
+    } else if (blueScore >= scoreCrit || redScore >= scoreCrit) {
+      return true;
+    } else if (blueScore <= -scoreCrit || redScore <= -scoreCrit) {
+      return true;
+    } else if ((blueScore - redScore).abs() >= scoreCrit) {
+      return true;
+    }
+    return false;
   }
 }

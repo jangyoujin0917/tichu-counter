@@ -4,11 +4,11 @@ import 'package:tichu/model/game_history_model.dart';
 class TichuDialog extends StatelessWidget {
   const TichuDialog({
     super.key,
-    required this.playerName,
+    required this.playerNames,
     required this.tichu,
   });
 
-  final List<String> playerName;
+  final List<String> playerNames;
   final TichuType tichu;
 
   @override
@@ -39,7 +39,7 @@ class TichuDialog extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(14.0),
                 child: Text(
-                  playerName[i],
+                  playerNames[i],
                   style: TextStyle(
                     fontSize: 20,
                     color: (i % 2 == 0) ? Colors.lightBlue : Colors.red,
