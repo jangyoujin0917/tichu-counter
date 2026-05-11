@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-05-09T21:30:15.123",
+  "playerName": ["정훈", "하두", "강민", "동동"],
+  "blueName": "정훈, 강민",
+  "redName": "하두, 동동",
+  "isGameEnd": false,
+  "commandHistory": {
+    "commands": [
+      { "type": "tichu", "playerIndex": 0, "isLarge": false },
+      { "type": "score", "winnerIndex": 0, "blueScore": 190, "redScore": 10 },
+      { "type": "score", "winnerIndex": 2, "blueScore": 25, "redScore": 75 },
+      { "type": "onetwo", "winnerIndex": 1, "team": "red" }
+    ]
+  }
+}

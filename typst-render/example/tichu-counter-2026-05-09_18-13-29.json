@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-05-09T18:13:29.667",
+  "playerName": [
+    "James",
+    "Andy",
+    "Robert",
+    "Lucas"
+  ],
+  "blueName": "Purple",
+  "redName": "Yellow",
+  "isGameEnd": true,
+  "commandHistory": {
+    "commands": [
+      {
+        "type": "score",
+        "winnerIndex": 0,
+        "blueScore": 85,
+        "redScore": 15
+      },
+      {
+        "type": "tichu",
+        "playerIndex": 1,
+        "isLarge": false
+      },
+      {
+        "type": "onetwo",
+        "winnerIndex": 1,
+        "team": "red"
+      },
+      {
+        "type": "tichu",
+        "playerIndex": 2,
+        "isLarge": true
+      },
+      {
+        "type": "score",
+        "winnerIndex": 2,
+        "blueScore": 45,
+        "redScore": 55
+      },
+      {
+        "type": "tichu",
+        "playerIndex": 0,
+        "isLarge": false
+      },
+      {
+        "type": "score",
+        "winnerIndex": 0,
+        "blueScore": 65,
+        "redScore": 35
+      },
+      {
+        "type": "tichu",
+        "playerIndex": 1,
+        "isLarge": false
+      },
+      {
+        "type": "score",
+        "winnerIndex": 1,
+        "blueScore": 30,
+        "redScore": 70
+      },
+      {
+        "type": "tichu",
+        "playerIndex": 2,
+        "isLarge": false
+      },
+      {
+        "type": "score",
+        "winnerIndex": 2,
+        "blueScore": 20,
+        "redScore": 80
+      },
+      {
+        "type": "tichu",
+        "playerIndex": 2,
+        "isLarge": false
+      },
+      {
+        "type": "score",
+        "winnerIndex": 1,
+        "blueScore": 35,
+        "redScore": 65
+      },
+      {
+        "type": "score",
+        "winnerIndex": 0,
+        "blueScore": 80,
+        "redScore": 20
+      },
+      {
+        "type": "score",
+        "winnerIndex": 1,
+        "blueScore": 65,
+        "redScore": 35
+      },
+      {
+        "type": "score",
+        "winnerIndex": 3,
+        "blueScore": -5,
+        "redScore": 105
+      },
+      {
+        "type": "tichu",
+        "playerIndex": 0,
+        "isLarge": true
+      },
+      {
+        "type": "score",
+        "winnerIndex": 0,
+        "blueScore": 35,
+        "redScore": 65
+      },
+      {
+        "type": "tichu",
+        "playerIndex": 2,
+        "isLarge": false
+      },
+      {
+        "type": "tichu",
+        "playerIndex": 3,
+        "isLarge": false
+      },
+      {
+        "type": "score",
+        "winnerIndex": 3,
+        "blueScore": -25,
+        "redScore": 125
+      }
+    ]
+  }
+}
